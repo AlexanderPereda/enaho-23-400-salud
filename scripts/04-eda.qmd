@@ -8,6 +8,7 @@ require("knitr")
 opts_chunk$set(echo = TRUE)
 opts_knit$set(root.dir = "..")
 ```
+
 # Cargar librerías necesarias
 
 ```{r}
@@ -85,10 +86,17 @@ conteo_variables <- datos_procesados |>
                names_to = "variable", 
                values_to = "valor") |>
   filter(valor == 1) |>
-  group_by(variable) |>
+  group_by(variable, zona) |>
   summarise(conteo = n(), 
-            porcentaje = (n() / nrow(datos_procesados)) * 100, 
-            .groups = 'drop')
+            .groups = 'drop') |>
+  pivot_wider(names_from = zona, 
+              values_from = conteo,
+              values_fill = 0)
+
+# Calcular la columna 'total' sumando las columnas de las zonas
+conteo_variables <- conteo_variables |>
+  mutate(total = Centro + Norte + Oriente + Sur) |>
+  rename_with(~ gsub("^conteo_", "", .), starts_with("conteo"))  # Eliminar el prefijo 'conteo_'
 
 # Reemplazar los nombres de las variables por etiquetas descriptivas
 conteo_variables <- conteo_variables |>
@@ -104,7 +112,16 @@ saveRDS(conteo_variables, file.path("outputs","conteo_variables.rds"))
 ```
 
 ```{r}
-barras <- ggplot(conteo_variables, aes(x = reorder(variable, conteo), y = conteo, fill = porcentaje)) +
+conteo_variables
+```
+
+```{r}
+# Calcular el porcentaje en función del total
+conteo_variables <- conteo_variables |>
+  mutate(porcentaje = total / sum(total) * 100)
+
+# Crear el gráfico de barras
+barras <- ggplot(conteo_variables, aes(x = reorder(variable, total), y = total, fill = porcentaje)) +
   geom_bar(stat = "identity") +
   scale_fill_gradient(low = "#C7B1CF", high = "#A857D1") +
   geom_text(aes(label = paste0(round(porcentaje, 1), "%")), 

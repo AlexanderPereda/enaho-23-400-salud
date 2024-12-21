@@ -51,5 +51,6 @@ rsconnect/
 # quarto freeze
 *_freeze
 
-# quarto 
+# quarto
 *.quarto
+/.quarto/

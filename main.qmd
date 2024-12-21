@@ -41,14 +41,14 @@ lapply(paquetes, instalar_paquete)
 
 En el Perú, el sector salud debe trabajar estrechamente con los datos para implementar reformas adecuadas que beneficien a los ciudadanos. La información proveniente de encuestas de hogares constituye un recurso valioso que podemos utilizar para obtener insights significativos.
 
-En este trabajo haremos un análisis sobre una pregunta muy común : **¿A dónde acudimos cuando nos sentimos enfermos?**
+En este trabajo haremos un análisis sobre una pregunta muy común: ¿A dónde acudimos cuando nos sentimos enfermos?
 
 Agruparemos a la población peruana en cuatro zonas geográficas:
 
--   Norte: Tumbes, Piura, Lambayeque, Cajamarca, La Libertad y Amazonas
--   Sur: Ayacucho, Cusco, Apurímac, Arequipa, Puno, Moquegua y Tacna
--   Oriente: Loreto, San Martín, Ucayali y Madre de Dios
--   Centro: Áncash, Huánuco, Pasco, Junín, Huancavelica, Ica, Callao y Lima
+-    Norte: Tumbes, Piura, Lambayeque, Cajamarca, La Libertad y Amazonas.
+-    Sur: Ayacucho, Cusco, Apurímac, Arequipa, Puno, Moquegua y Tacna.
+-    Oriente: Loreto, San Martín, Ucayali y Madre de Dios.
+-    Centro: Áncash, Huánuco, Pasco, Junín, Huancavelica, Ica, Callao y Lima.
 
 Nos proponemos a responder las siguientes preguntas:
 
@@ -60,11 +60,13 @@ Nos proponemos a responder las siguientes preguntas:
 
 La información general del proyecto es la siguiente:
 
--   Fuente de datos: Módulo 400 de ENAHO 2023, obtenido de la página de [microdatos de INEI](https://proyectos.inei.gob.pe/microdatos/ "Ir al enlace"), y "Límites departamentales" obtenido de la página de [datos abiertos del Perù](https://www.datosabiertos.gob.pe/dataset/limites-departamentales "Ir al enlace").
+-   Fuente de datos: Módulo 400 de ENAHO 2023, obtenido de la página de [microdatos de INEI](https://proyectos.inei.gob.pe/microdatos/ "Ir al enlace"), y "Límites departamentales" obtenido de la página de [datos abiertos del Perú](https://www.datosabiertos.gob.pe/dataset/limites-departamentales "Ir al enlace").
 
--   Entorno de trabajo: El análisis se realiza en Visual Studio Code utilizando el lenguaje de programación R.
+-   Entorno de trabajo: Visual Studio Code.
 
--   Formato: El documento se presenta en formato Quarto, adoptando un enfoque narrativo para los resultados. Los archivos están debidamente comentados y siguen buenas prácticas para garantizar la reproducibilidad.
+-   Lenguaje de programacion: R.   
+
+-   Formato: El documento se realizó en Quarto, y se adoptó un enfoque narrativo para los resultados. Los archivos están debidamente comentados y siguen buenas prácticas para garantizar la reproducibilidad.
 
 PSDT: se recomienda mucho leer la [ficha técnica](https://proyectos.inei.gob.pe/iinei/srienaho/Descarga/FichaTecnica/906-Ficha.pdf "Ir al documento"), toda la información relevante sobre ENAHO se encuentra allí.
 
@@ -72,13 +74,13 @@ PSDT: se recomienda mucho leer la [ficha técnica](https://proyectos.inei.gob.pe
 
 # Importación de los datos
 
-En la página de microdatos de la INEI, buscamos la encuesta ENAHO 2023 y descargamos el [módulo 400 (salud)](https://proyectos.inei.gob.pe/iinei/srienaho/descarga/STATA/906-Modulo04.zip "Ir al enlace").
+En la página de microdatos del INEI, buscamos la encuesta ENAHO 2023 y descargamos el [módulo 400 (salud)](https://proyectos.inei.gob.pe/iinei/srienaho/descarga/STATA/906-Modulo04.zip "Ir al enlace").
 
-Dicho módulo contiene información sobre el ubigeo, si la persona sintió o no malestar, a dónde fue en caso de sentirse mal, entre otros. Nosotros solo extraeremos las columnas necesarias.
+Este módulo contiene información sobre el ubigeo, si la persona experimentó malestar, a dónde acudió en caso de sentirse mal, entre otros datos. Nosotros extraeremos únicamente las columnas necesarias.
 
 ```{r, echo = FALSE}
 #| label: tabla_datos
-#| tbl-cap: Datos extraidos del módulo 400 ENAHO 2023
+#| tbl-cap: Módulo 400 - ENAHO 2023
 datos <- readRDS(file.path("outputs", "datos.rds"))
 datos[1:10, ]
 ```
@@ -88,7 +90,7 @@ datos[1:10, ]
 A continuación una tabla para describir los datos:
 
 | Variable | Descripción |
-|------------------------|-----------------------------------------------|
+|-------------------------|----------------------------------------------|
 | Ubigeo | Ubicación geográfica |
 | p4025 | ¿Presentó algún malestar en las últimas 4 semanas? (1: No / 0: Sí) |
 | p4031 | Acudió al "Puesto de salud MINSA" a consultar por el malestar (1: Sí / 0: No) |
@@ -109,7 +111,7 @@ A continuación una tabla para describir los datos:
 
 # Preprocesamiento
 
-Es importante ver la distribución de valores faltantes según `zona`.
+Iniciamos observando la cantidad de valores faltantes según `zona`.
 
 ```{r, echo = FALSE}
 #| label : porcentajes_na
@@ -120,21 +122,20 @@ porcentajes
 
 Observamos:
 
--   El Sur presenta mayor tasa de missings (44%), seguido del Centro (32%)
--   Norte y Oriente presentan bajas tasas (15% y 7% respect.)
--   Hay 105 missings, que representan el 0.087% de nuestros datos totales.
+-   El Sur presenta la mayor tasa de valores faltantes (44%), seguido del Centro (32%).
+-   El Norte y Oriente presentan tasas bajas (15% y 7%, respectivamente).
+-   Hay 105 valores faltantes, que representan el 0.087% de nuestros datos totales.
+-   Dado que los datos faltantes son tan pocos, podemos eliminarlos.
 
-Al ser tan pocos datos missings, podemos eliminarlos.
-
-Además, como solo nos interesan solo los enfermos, filtramos los datos solo a ese sector.
+Además, como solo nos interesan los casos de personas enfermas, filtramos la información para quedarnos solo con ese sector.
 
 <hr>
 
 # Análisis
 
-Ya estamos en condición de poder dar respuesta a nuestras 3 interrogantes.
+Ya estamos en condiciones de dar respuesta a nuestras tres interrogantes.
 
-Primero veamos la distribución de los datos, para ello nos valemos de una tabla de frecuencias y un mapa.
+Primero, veamos la distribución de los datos. Para ello, nos valemos de una tabla y un mapa.
 
 ```{r, echo = FALSE}
 #| label: conteo
@@ -153,11 +154,11 @@ conteo
 
 <p> </p>
 
-Podemos observar lo siguiente:
+Se observa lo siguiente:
 
--   La zona Centro posee mayor concentración de individuos (40%).
--   La zona Norte y Sur poseen cantidades bastante semejantes (aprox. 23%).
--   Oriente cuenta con un 13% de población afectada.
+-   La zona Centro tiene la mayor concentración de individuos (40%).
+-   Las zonas Norte y Sur tienen cantidades bastante semejantes (aproximadamente 23%).
+-   Oriente cuenta con un 13% de la población afectada.
 
 ## Pregunta 2
 
@@ -165,13 +166,13 @@ Podemos observar lo siguiente:
 
 <p> </p>
 
-El siguiente gráfico de barras nos da la respuesta.
+El siguiente gráfico nos da la respuesta.
 
 ::: image
 [Preferencias de la población con malestar según zona.]{style="display: block; text-align: center; margin-top: 5px;"} ![distribucion-preferencias-por-zona](outputs/grafico_preferencias.png) [Elaboración propia.]{style="display: block; text-align: center; font-style: italic; margin-top: 5px;"} [Fuente: Enaho 2023, Módulo 400]{style="display: block; text-align: center; font-style: italic;"}
 :::
 
-Podemos ver como las 4 zonas son prácticamente idénticas en comportamiento, por lo tanto podemos decir que ante un malestar el peruano tiene una respuesta uniforme a lo largo y ancho de todo el Perú.
+Las 4 zonas tienen comportamientos muy semejantes, con ligeras variaciones para algunas variables. Podemos decir que las preferencias de las personas enfermas es *quasi-uniforme*.
 
 ## Pregunta 3
 
@@ -196,18 +197,33 @@ tabla <- readRDS(file.path("outputs", "conteo_variables.rds"))
 tabla
 ```
 
+A pesar de que las cantidades pueden variar, el resultado es el mismo: La gran mayoria prefiere no buscar atención.
+
+<p> </p>
+
 ::: image
 [Preferencias de la población con malestar en el Perú.]{style="display: block; text-align: center; margin-top: 5px;"} ![preferencias-peru](outputs/barras.png) [Elaboración propia.]{style="display: block; text-align: center; font-style: italic; margin-top: 5px;"} [Fuente: Enaho 2023, Módulo 400]{style="display: block; text-align: center; font-style: italic;"}
 :::
 
-Podemos ver que la acción mas común para un peruano es no buscar atención; por otro lado la opción de la farmacia o botica ocupa la segunda posición, lo cual puede deberse a la facilidad de acceso que tienen los peruanos a estos establecimientos y la comodidad de los precios.
 
 <hr>
 
 # Conclusiones
 
--   Independientemente de la zona geográfica, el peruano reacciona de la misma manera ante un malestar.
+-   Independientemente de la zona geográfica, el peruano reacciona prácticamente de la misma manera ante un malestar.
+
+-   La zona centro es la que presenta la mayor concentración de individuos con malestar (40%). 
 
 -   Aproximadamente 46.6% de la población no busca atención ante una dolencia.
 
--   El total de personas que se auto-receta o busca consulta en boticas o farmacias es más del doble que aquellos que asisten al puesto de Salud Minsa, siendo un total del 22.1% de la población.
+-   El 28% de la población prefiere atenderse en una botica o farmacia, muy probablemente debido al fácil acceso y precios de dichos establecimientos.
+
+
+# Scripts del Proyecto
+
+Puedes acceder a los scripts utilizados en este proyecto. Haz clic en los enlaces para verlos con el formato visual adecuado.
+
+- [01. Importar Datos](scripts/01-import-data.html)
+- [02. Preprocesamiento de Datos](scripts/02-preprocess-data.html)
+- [03. Mapa](scripts/03-mapa.html)
+- [04. EDA (Análisis Exploratorio de Datos)](scripts/04-eda.html)

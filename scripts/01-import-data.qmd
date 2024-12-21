@@ -1,7 +1,6 @@
 ---
 title: "01-import-data"
 output: html_document
-
 ---
 
 ```{r setup, include=FALSE}
@@ -10,13 +9,11 @@ opts_chunk$set(echo = TRUE)
 opts_knit$set(root.dir = "..")
 ```
 
-
 ```{r}
 library(haven)
 library(data.table)
 library(sf)
 ```
-
 
 Antes de trabajar con cualquier módulo de ENAHO, se recomienda leer con calma su ficha técnica y el diccionario de variables (el cual es descargado junto con los datos en el enlace provisto en la sección principal).
 

@@ -3,8 +3,6 @@ title: "02-preprocess-data"
 output: html_document
 ---
 
-
-
 ```{r setup, include=FALSE}
 require("knitr")
 opts_chunk$set(echo = TRUE)
@@ -17,7 +15,6 @@ opts_knit$set(root.dir = "..")
 library(dplyr)
 library(haven)
 ```
-
 
 El modulo 400 no tiene una columna de clasificaciones geográficas, asi que la crearemos.
 
@@ -90,9 +87,9 @@ La columna p4025, que nos indica si alguien sintio o no un malestar, contiene 10
 porcentajes_na <- datos |>
     group_by(zona) |>
     summarise(
-        total_na = sum(is.na(p4025)),
-        percent_na = (total_na / 105) * 100,
-        percent_total = (total_na / dim(datos)[1]) * 100
+        total = sum(is.na(p4025)),
+        porcentaje_missings = (total / 105) * 100,
+        porcentaje_total = (total / dim(datos)[1]) * 100
     )
 
 
