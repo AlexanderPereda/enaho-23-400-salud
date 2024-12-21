@@ -1,0 +1,143 @@
+---
+title: "02-preprocess-data"
+output: html_document
+---
+
+
+
+```{r setup, include=FALSE}
+require("knitr")
+opts_chunk$set(echo = TRUE)
+opts_knit$set(root.dir = "..")
+```
+
+# Cargar librerías necesarias
+
+```{r}
+library(dplyr)
+library(haven)
+```
+
+
+El modulo 400 no tiene una columna de clasificaciones geográficas, asi que la crearemos.
+
+Definimos una función para clasificar por zonas según ubigeo.
+
+```{r}
+#| label : funcion clasifica_zonas
+
+clasifica_zonas <- function(ubigeo) {
+    if (nchar(ubigeo) == 5) {
+        ubigeo <- paste0("0", ubigeo)
+    }
+
+    # Primeros dos digitos de ubigeo
+    inicio <- substr(ubigeo, 1, 2)
+
+    # Codigo de ubigeos departamentales de las zonas correspondientes
+    cod_norte <- c("24", "20", "14", "06", "13", "01")
+    cod_sur <- c("05", "08", "03", "04", "21", "18", "23")
+    cod_oriente <- c("16", "22", "25", "17")
+    cod_centro <- c("02", "10", "19", "12", "09", "11", "07", "15")
+
+    # Clasificacion
+
+    if (inicio %in% cod_norte) {
+        return("Norte")
+    } else if (inicio %in% cod_sur) {
+        return("Sur")
+    } else if (inicio %in% cod_oriente) {
+        return("Oriente")
+    } else if (inicio %in% cod_centro) {
+        return("Centro")
+    } else {
+        return("Desconocido") # En caso haya anomalias
+    }
+}
+```
+
+Creamos la columna `zona` aplicando la función a la columna `ubigeo` de nuestros datos previamente importados.
+
+```{r}
+#| label: datos$zona
+datos <- readRDS("outputs/datos.rds")
+datos$zona <- sapply(datos$ubigeo, clasifica_zonas)
+```
+
+Ahora busquemos algunos valores missings.
+
+```{r}
+#|label : missing_df
+
+# calculando los missings totales por columna
+missing_por_columna <- colSums(is.na(datos))
+
+# creando un dataframe para organizar los datos
+missing_df <- data.frame(
+    variable = names(missing_por_columna),
+    missing_values = missing_por_columna
+)
+
+# guardamos los datos
+saveRDS(missing_df, file.path("outputs", "missing_df.rds"))
+```
+
+La columna p4025, que nos indica si alguien sintio o no un malestar, contiene 105 missings. Echemos un vistazo a aquellas filas.
+
+```{r}
+#| label: porcentajes_na
+
+porcentajes_na <- datos |>
+    group_by(zona) |>
+    summarise(
+        total_na = sum(is.na(p4025)),
+        percent_na = (total_na / 105) * 100,
+        percent_total = (total_na / dim(datos)[1]) * 100
+    )
+
+
+saveRDS(porcentajes_na, file.path("outputs", "porcentajes.rds"))
+```
+
+Los datos faltantes representan únicamente el 0.04% del total de los datos, asi que podriamos prescindir de esa información.
+
+Al ser solo 105 datos podemos inspeccionar visualmente la tabla, y notaremos que prácticamente todas las columnas están vacías, por lo que procederemos a eliminar esas filas.
+
+```{r}
+#| label: eliminando 105 missings
+
+# Procediendo la eliminacion
+datos <- datos |>
+    filter(!is.na(p4025))
+
+# Revisando si hay missings
+summary(datos)
+```
+
+Tenemos un caso curioso: todas las columnas "p403" tienen 49349 missings exactamente. Su explicación se puede ver en el siguiente resultado.
+
+```{r}
+#| label: conteo_p4025
+
+conteo_p4025 <- datos |>
+    group_by(p4025) |>
+    summarise(conteo = n())
+
+conteo_p4025
+```
+
+El valor 1 , para la columna p4025, significa que la persona no sintio malestar.
+
+Las columnas p403 registran a donde se fue a atender una persona que sintio un malestar, es evidente que estan vacias para cada caso 1. Pudieron completarse con un 0, sin embargo el modulo 400 es tan amplio, que para aligerar su peso, parece ser que se omitieron ciertos valores que eran obvios. Para responder esta primera pregunta no necesitamos completar esos valores omitidos. Solo nos interesa saber donde se atendieron las personas.
+
+```{r}
+#| label: datos_procesados
+
+# Creando un nuevo conjunto de datos
+
+datos_procesados <- datos |>
+    filter(p4025 == 0) |>
+    mutate(across(starts_with("p403"), as.numeric))
+# guardamos los datos
+saveRDS(datos_procesados, file.path("outputs", "datos_procesados.rds"))
+```

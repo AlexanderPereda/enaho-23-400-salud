@@ -1,0 +1,36 @@
+project:
+  type: website
+  output-dir: docs  
+  execute-dir: project
+  
+website:
+  title: "¿A dónde va un peruano cuando se enferma?"
+
+editor: visual
+
+execute:
+  freeze: auto
+
+format:
+  html:
+    self-contained: true
+    table-scroll: true
+    default-image-extension: svg
+    df-print: paged
+    code-fold: show
+    link-external-newwindow: true
+    toc: true
+    toc-title: "Índice"
+    toc-depth: 2
+    toc-location: left
+    smooth-scroll: true
+    code-overflow: wrap
+    reader-mode: true
+    page-layout: article
+    fontsize: 1.1em
+    fig-align: "center"
+    mainfont: Roboto
+    monofont: Lato
+    highlight-style: github
+    theme:
+      dark: darkly

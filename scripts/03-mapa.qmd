@@ -1,0 +1,119 @@
+---
+title: "03-mapa"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require("knitr")
+opts_chunk$set(echo = TRUE)
+opts_knit$set(root.dir = "..")
+```
+
+# Cargar librerías necesarias
+
+```{r , include=FALSE}
+library(dplyr)
+library(sf)
+library(ggplot2)
+```
+
+Crearemos un mapa para visualizar la distribución de individuos enfermos según zona.
+
+Empecemos creando una función que asigna a cada departamento su zona correspondiente.
+
+```{r}
+#| label : funcion asignar_zona
+
+# Crear una función para asignar zona según el departamento
+
+asignar_zona <- function(departamento) {
+    # Definir las zonas por departamento
+    zona_norte <- c("TUMBES", "PIURA", "LAMBAYEQUE", "CAJAMARCA", "LA LIBERTAD", "AMAZONAS")
+    zona_sur <- c("AYACUCHO", "CUSCO", "APURIMAC", "AREQUIPA", "PUNO", "MOQUEGUA", "TACNA")
+    zona_oriente <- c("LORETO", "SAN MARTIN", "UCAYALI", "MADRE DE DIOS")
+    zona_centro <- c("ANCASH", "HUANUCO", "PASCO", "JUNIN", "HUANCAVELICA", "ICA", "CALLAO", "LIMA")
+
+    # Asignar la zona según el departamento
+    if (departamento %in% zona_norte) {
+        return("Norte")
+    } else if (departamento %in% zona_sur) {
+        return("Sur")
+    } else if (departamento %in% zona_oriente) {
+        return("Oriente")
+    } else if (departamento %in% zona_centro) {
+        return("Centro")
+    } else {
+        return(NA) # Si no encuentra el departamento, retorna NA
+    }
+}
+
+# Aplicar la función al shapefile para añadir la columna 'zona'
+peru_shapefile <- readRDS("outputs/departamentos.rds")
+peru_shapefile$zona <- sapply(peru_shapefile$DEPARTAMEN, asignar_zona)
+
+# Ver el resultado
+head(peru_shapefile)
+```
+
+Ahora hagamos el conteo de individuos con malestar por zona.
+
+```{r}
+datos_procesados <- readRDS("outputs/datos_procesados.rds")
+
+conteo <- datos_procesados |>
+    group_by(zona) |>
+    summarise(
+        conteo = n(),
+        porcentaje = (n() / nrow(datos_procesados)) * 100,
+        .groups = "drop"
+    )
+
+saveRDS(conteo, file.path("outputs", "conteo.rds"))
+```
+
+Crucemos la información de conteo con los datos espaciales de Perú.
+
+```{r}
+
+peru_shapefile <- peru_shapefile |>
+    left_join(conteo |> select(zona, conteo), by = c("zona" = "zona"))
+
+peru_shapefile
+
+```
+
+```{r}
+
+# Crear el mapa con ggplot2
+mapa <- ggplot(data = peru_shapefile) +
+    geom_sf(aes(fill = conteo),
+        color = "black",
+        size = 0.5
+    ) + # Colorear según conteo
+
+    scale_fill_gradient(
+        low = "white",
+        high = "purple",
+        limits = c(7000, max(peru_shapefile$conteo))
+    ) +
+    labs(
+        title = "Distribución de personas con malestar según zonas",
+        fill = "Conteo"
+    ) +
+    theme_minimal() + # Estilo minimalista
+
+    theme(
+        axis.text = element_blank(), # Ocultar los textos del eje
+        axis.ticks = element_blank(),
+        plot.title = element_text(
+            color = "white",
+            hjust = 0.5,
+            size = 16,
+            face = "bold"
+        ), # Título en blanco
+        legend.title = element_text(color = "white"), # Título de leyenda en blanco
+        legend.text = element_text(color = "white")
+    ) # Texto de leyenda en blanco)  # Ocultar las marcas del eje
+
+ggsave(file.path("outputs", "mapa.png"), plot = mapa, width = 10, height = 8, dpi = 300)
+```

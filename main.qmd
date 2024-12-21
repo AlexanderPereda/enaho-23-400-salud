@@ -1,0 +1,213 @@
+---
+title: "¿A dónde va un peruano cuando se enferma?"
+subtitle: "Un análisis de salud de la ENAHO 2023"
+author: 
+  - name: Alexander Pereda Escalante
+    email: alexanderperedaescalante@gmail.com
+    affiliations:
+      - name: Universidad Nacional Mayor de San Marcos
+        city: Lima
+        country: Perú
+date: last-modified
+lang: es
+---
+
+```{r setup, echo = FALSE, results = "hide"}
+#|label: setup inicial main
+
+# Función para instalar paquetes
+instalar_paquete <- function(paquete) {
+    if (!requireNamespace(paquete, quietly = TRUE)) {
+        install.packages(paquete)
+        print(paste("Paquete", paquete, "instalado con éxito."))
+    } else {
+        print(paste("Paquete", paquete, "ya está instalado."))
+    }
+}
+
+
+# Lista de paquetes necesarios
+paquetes <- c(
+    "data.table", "haven", "dplyr", "rmarkdown", "ggplot2",
+    "sf", "tidyr", "patchwork", "clipr", "crayon", "prettyunits", "knitr", "here"
+)
+
+# Instalar los paquetes
+lapply(paquetes, instalar_paquete)
+
+```
+
+# Introducción
+
+En el Perú, el sector salud debe trabajar estrechamente con los datos para implementar reformas adecuadas que beneficien a los ciudadanos. La información proveniente de encuestas de hogares constituye un recurso valioso que podemos utilizar para obtener insights significativos.
+
+En este trabajo haremos un análisis sobre una pregunta muy común : **¿A dónde acudimos cuando nos sentimos enfermos?**
+
+Agruparemos a la población peruana en cuatro zonas geográficas:
+
+-   Norte: Tumbes, Piura, Lambayeque, Cajamarca, La Libertad y Amazonas
+-   Sur: Ayacucho, Cusco, Apurímac, Arequipa, Puno, Moquegua y Tacna
+-   Oriente: Loreto, San Martín, Ucayali y Madre de Dios
+-   Centro: Áncash, Huánuco, Pasco, Junín, Huancavelica, Ica, Callao y Lima
+
+Nos proponemos a responder las siguientes preguntas:
+
+1.  ¿Cómo están distribuidas las personas que presentaron algún malestar en el Perú según la zona geográfica?
+
+2.  ¿Cómo varían las preferencias de las personas que presentan algún malestar según la zona en que se ubican?
+
+3.  ¿Qué establecimientos visitan más?
+
+La información general del proyecto es la siguiente:
+
+-   Fuente de datos: Módulo 400 de ENAHO 2023, obtenido de la página de [microdatos de INEI](https://proyectos.inei.gob.pe/microdatos/ "Ir al enlace"), y "Límites departamentales" obtenido de la página de [datos abiertos del Perù](https://www.datosabiertos.gob.pe/dataset/limites-departamentales "Ir al enlace").
+
+-   Entorno de trabajo: El análisis se realiza en Visual Studio Code utilizando el lenguaje de programación R.
+
+-   Formato: El documento se presenta en formato Quarto, adoptando un enfoque narrativo para los resultados. Los archivos están debidamente comentados y siguen buenas prácticas para garantizar la reproducibilidad.
+
+PSDT: se recomienda mucho leer la [ficha técnica](https://proyectos.inei.gob.pe/iinei/srienaho/Descarga/FichaTecnica/906-Ficha.pdf "Ir al documento"), toda la información relevante sobre ENAHO se encuentra allí.
+
+<hr>
+
+# Importación de los datos
+
+En la página de microdatos de la INEI, buscamos la encuesta ENAHO 2023 y descargamos el [módulo 400 (salud)](https://proyectos.inei.gob.pe/iinei/srienaho/descarga/STATA/906-Modulo04.zip "Ir al enlace").
+
+Dicho módulo contiene información sobre el ubigeo, si la persona sintió o no malestar, a dónde fue en caso de sentirse mal, entre otros. Nosotros solo extraeremos las columnas necesarias.
+
+```{r, echo = FALSE}
+#| label: tabla_datos
+#| tbl-cap: Datos extraidos del módulo 400 ENAHO 2023
+datos <- readRDS(file.path("outputs", "datos.rds"))
+datos[1:10, ]
+```
+
+<p> </p>
+
+A continuación una tabla para describir los datos:
+
+| Variable | Descripción |
+|------------------------|-----------------------------------------------|
+| Ubigeo | Ubicación geográfica |
+| p4025 | ¿Presentó algún malestar en las últimas 4 semanas? (1: No / 0: Sí) |
+| p4031 | Acudió al "Puesto de salud MINSA" a consultar por el malestar (1: Sí / 0: No) |
+| p4032 | Acudió al "Centro de salud MINSA" a consultar por el malestar (1: Sí / 0: No) |
+| p4033 | Acudió al "Centro o puesto de salud CLAS" a consultar por el malestar (1: Sí / 0: No) |
+| p4034 | Acudió a "Posta, policlínico, EsSalud" a consultar por el malestar (1: Sí / 0: No) |
+| p4035 | Acudió al "Hospital MINSA" a consultar por el malestar (1: Sí / 0: No) |
+| p4036 | Acudió al "Hospital del Seguro (EsSalud)" a consultar por el malestar (1: Sí / 0: No) |
+| p4037 | Acudió al "Hospital de las FF.AA y/o Policia Nacional" a consultar por el malestar (1: Sí / 0: No) |
+| p4038 | Acudió al "Consultorio médico particular" a consultar por el malestar (1: Sí / 0: No) |
+| p4039 | Acudió a "Clínica particular" a consultar por el malestar (1: Sí / 0: No) |
+| p40310 | Acudió a "Farmacia o botica" a consultar por el malestar (1: Sí / 0: No) |
+| p40311 | Acudió a "En su domicilio (del paciente)" a consultar por el malestar (1: Sí / 0: No) |
+| p40313 | Acudió al "Otro" a consultar por el malestar (1: Sí / 0: No) |
+| p40314 | No buscó atención (1: No buscó atención / 0: No) |
+
+<hr>
+
+# Preprocesamiento
+
+Es importante ver la distribución de valores faltantes según `zona`.
+
+```{r, echo = FALSE}
+#| label : porcentajes_na
+
+porcentajes <- readRDS(file.path("outputs", "porcentajes.rds"))
+porcentajes
+```
+
+Observamos:
+
+-   El Sur presenta mayor tasa de missings (44%), seguido del Centro (32%)
+-   Norte y Oriente presentan bajas tasas (15% y 7% respect.)
+-   Hay 105 missings, que representan el 0.087% de nuestros datos totales.
+
+Al ser tan pocos datos missings, podemos eliminarlos.
+
+Además, como solo nos interesan solo los enfermos, filtramos los datos solo a ese sector.
+
+<hr>
+
+# Análisis
+
+Ya estamos en condición de poder dar respuesta a nuestras 3 interrogantes.
+
+Primero veamos la distribución de los datos, para ello nos valemos de una tabla de frecuencias y un mapa.
+
+```{r, echo = FALSE}
+#| label: conteo
+#| tbl-cap: Tabla de frecuencias
+conteo <- readRDS(file.path("outputs", "conteo.rds"))
+conteo
+```
+
+::: image
+![distribucion-malestar-por-zona](outputs/mapa.png) [Elaboración propia.]{style="display: block; text-align: center; font-style: italic; margin-top: 5px;"} [Fuente: Enaho 2023, Módulo 400]{style="display: block; text-align: center; font-style: italic;"}
+:::
+
+## Pregunta 1
+
+#### ¿Cómo están distribuidas las personas que presentaron algún malestar en el Perú según la zona geográfica?
+
+<p> </p>
+
+Podemos observar lo siguiente:
+
+-   La zona Centro posee mayor concentración de individuos (40%).
+-   La zona Norte y Sur poseen cantidades bastante semejantes (aprox. 23%).
+-   Oriente cuenta con un 13% de población afectada.
+
+## Pregunta 2
+
+#### ¿Cómo varían las preferencias de las personas que presentan algún malestar según la zona en que se ubican?
+
+<p> </p>
+
+El siguiente gráfico de barras nos da la respuesta.
+
+::: image
+[Preferencias de la población con malestar según zona.]{style="display: block; text-align: center; margin-top: 5px;"} ![distribucion-preferencias-por-zona](outputs/grafico_preferencias.png) [Elaboración propia.]{style="display: block; text-align: center; font-style: italic; margin-top: 5px;"} [Fuente: Enaho 2023, Módulo 400]{style="display: block; text-align: center; font-style: italic;"}
+:::
+
+Podemos ver como las 4 zonas son prácticamente idénticas en comportamiento, por lo tanto podemos decir que ante un malestar el peruano tiene una respuesta uniforme a lo largo y ancho de todo el Perú.
+
+## Pregunta 3
+
+#### ¿Qué establecimientos visitan más?
+
+<p> </p>
+
+Del gráfico anterior son 3 las variables que destacan:
+
+-   p40314 : No buscó atención a su dolencia.
+
+-   p40310 : Buscó consulta sobre su dolencia en la farmacia o botica.
+
+-   p4031 : Buscó consulta sobre su dolencia en puesto de salud MINSA.
+
+Veámoslas mas de cerca.
+
+```{r , echo = FALSE}
+#| label: tabla de variables
+#| tbl-cap: Frecuencia de las variables en todo el Perú
+tabla <- readRDS(file.path("outputs", "conteo_variables.rds"))
+tabla
+```
+
+::: image
+[Preferencias de la población con malestar en el Perú.]{style="display: block; text-align: center; margin-top: 5px;"} ![preferencias-peru](outputs/barras.png) [Elaboración propia.]{style="display: block; text-align: center; font-style: italic; margin-top: 5px;"} [Fuente: Enaho 2023, Módulo 400]{style="display: block; text-align: center; font-style: italic;"}
+:::
+
+Podemos ver que la acción mas común para un peruano es no buscar atención; por otro lado la opción de la farmacia o botica ocupa la segunda posición, lo cual puede deberse a la facilidad de acceso que tienen los peruanos a estos establecimientos y la comodidad de los precios.
+
+<hr>
+
+# Conclusiones
+
+-   Independientemente de la zona geográfica, el peruano reacciona de la misma manera ante un malestar.
+
+-   Aproximadamente 46.6% de la población no busca atención ante una dolencia.
+
+-   El total de personas que se auto-receta o busca consulta en boticas o farmacias es más del doble que aquellos que asisten al puesto de Salud Minsa, siendo un total del 22.1% de la población.

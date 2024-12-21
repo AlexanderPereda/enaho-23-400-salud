@@ -1,0 +1,54 @@
+---
+title: "01-import-data"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+require("knitr")
+opts_chunk$set(echo = TRUE)
+opts_knit$set(root.dir = "..")
+```
+
+
+```{r}
+library(haven)
+library(data.table)
+library(sf)
+```
+
+
+Antes de trabajar con cualquier módulo de ENAHO, se recomienda leer con calma su ficha técnica y el diccionario de variables (el cual es descargado junto con los datos en el enlace provisto en la sección principal).
+
+Luego de haber hecho ese trabajo, importaremos solo las columnas que nos interesa para responder nuestra pregunta clave: ¿a dónde va un peruano cuando se siente mal?
+
+### Enaho 2023 - 400
+
+```{r}
+#| label : import_data
+
+set.seed(123)                                                                # <1>
+modulo400 <- read_dta("data/enaho01a-2023-400.dta")                          # <2>
+columnas <- c(7, 48, 50:62)                                                  # <3>
+datos <- as.data.table(modulo400)[, ..columnas]                              # <4>
+setnames(datos, tolower(names(datos)))                                       # <5>
+saveRDS(datos, file.path("outputs","datos.rds"))                             # <6>
+```
+
+1.  Fijar semilla para reproducibilidad
+2.  Cargando el módulo completo desde el archivo .dta
+3.  Selección de columnas de interés
+4.  Convertir el dataset a un formato de data.table
+5.  Convertir los nombres de las columnas a minúsculas
+6.  Guardar la tabla en formato .rds
+
+Con miras de realizar un mapa para graficar mejor la idea que queremos realizar importaremos también un un shapefile de Limites departamentales obtenido de la página de \[datos abiertos del Perù\](<https://www.datosabiertos.gob.pe/dataset/limites-departamentales> "Ir al enlace").
+
+```{r}
+#| label: import shape file peru
+peru_shapefile <- st_read("data/DEPARTAMENTOS.shp")                           #<1>
+saveRDS(peru_shapefile, file.path("outputs", "departamentos.rds"))    #<2>
+```
+
+1.  Cargamos el shapefile donde esta contenida la informacion geoespacial que necesitamos del Perú.
+2.  Guardamos el archivo para su posterior uso.
