@@ -1,21 +1,24 @@
 ---
-title: "03-mapa"
+title: "Mapa"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+# Setup e instalación de librerias
+
+```{r setup, results = "hide"}
 require("knitr")
 opts_chunk$set(echo = TRUE)
 opts_knit$set(root.dir = "..")
 ```
 
-# Cargar librerías necesarias
-
-```{r , include=FALSE}
+```{r, results = "hide"}
 library(dplyr)
 library(sf)
 library(ggplot2)
 ```
+
+
+# Función de asignación
 
 Crearemos un mapa para visualizar la distribución de individuos enfermos según zona.
 
@@ -55,6 +58,9 @@ peru_shapefile$zona <- sapply(peru_shapefile$DEPARTAMEN, asignar_zona)
 head(peru_shapefile)
 ```
 
+
+# Conteo
+
 Ahora hagamos el conteo de individuos con malestar por zona.
 
 ```{r}
@@ -69,6 +75,9 @@ conteo <- datos_procesados |>
     )
 
 saveRDS(conteo, file.path("outputs", "conteo.rds"))
+
+# resultados
+conteo
 ```
 
 Crucemos la información de conteo con los datos espaciales de Perú.
@@ -79,8 +88,9 @@ peru_shapefile <- peru_shapefile |>
     left_join(conteo |> select(zona, conteo), by = c("zona" = "zona"))
 
 peru_shapefile
-
 ```
+
+# Creando el mapa
 
 ```{r}
 
@@ -116,4 +126,6 @@ mapa <- ggplot(data = peru_shapefile) +
     ) # Texto de leyenda en blanco)  # Ocultar las marcas del eje
 
 ggsave(file.path("outputs", "mapa.png"), plot = mapa, width = 10, height = 8, dpi = 300)
+
+mapa
 ```

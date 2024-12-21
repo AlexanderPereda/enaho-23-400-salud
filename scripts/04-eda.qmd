@@ -1,27 +1,28 @@
 ---
-title: "04-eda"
+title: "Análisis Exploratorio de Datos"
 output: html_document
 ---
 
-```{r, include = FALSE}
+# Setup e instalación de librerias
+
+```{r, results = "hide"}
 require("knitr")
 opts_chunk$set(echo = TRUE)
 opts_knit$set(root.dir = "..")
 ```
 
-# Cargar librerías necesarias
-
-```{r}
+```{r, results = "hide"}
 library(dplyr)      
 library(tidyr)      
 library(ggplot2)    
 library(patchwork)  
 ```
 
+#
+
 ```{r}
 #| label : funcion grafico_zona
 
-# Crearemos un grafico de todas las posibles opciones de consulta para aquel que sintio malestar, dividido por zonas. El significado de cada variable puede ser revisado al inicio del documento.
 grafico_zona <- function(data, region) {
   
   # Creamos un df filtrado
@@ -36,10 +37,10 @@ grafico_zona <- function(data, region) {
     group_by(Columna) |>
     summarise(Cantidad = n(), .groups = 'drop')  # Contamos las ocurrencias de valor 1
 
-  # Crear el gráfico de barras con color morado fijo
+  # Crear el gráfico de barras con color morado
   ggplot(frecuencia, aes(x = Cantidad, y = Columna)) +
     geom_bar(stat = "identity", position = "dodge", fill = "#A456DB", show.legend = FALSE) +  # formato de las barras
-    labs(title = region, x = "", y = "") +  # Título de la zona y ejes vacíos
+    labs(title = region, x = "", y = "") +  # Título de la zona
     theme_minimal() +  # Usamos un tema minimalista
     theme(
       axis.ticks = element_blank(),
@@ -77,6 +78,8 @@ grafico_zonas <- grafico_norte + grafico_sur + grafico_centro + grafico_oriente 
   plot_layout(ncol = 2) 
 
 ggsave(file.path("outputs","grafico_preferencias.png"), plot = grafico_zonas, width = 10, height = 8, dpi = 300)
+
+grafico_zonas
 ```
 
 ```{r}
@@ -108,7 +111,6 @@ conteo_variables <- conteo_variables |>
   ))
 
 saveRDS(conteo_variables, file.path("outputs","conteo_variables.rds"))
-
 ```
 
 ```{r}
@@ -145,4 +147,6 @@ barras <- ggplot(conteo_variables, aes(x = reorder(variable, total), y = total, 
   )
 
 ggsave(file.path("outputs","barras.png"), plot = barras, width = 10, height = 8, dpi = 300)  
+
+barras
 ```

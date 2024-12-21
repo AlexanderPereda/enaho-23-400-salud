@@ -1,26 +1,29 @@
 ---
-title: "02-preprocess-data"
+title: "Preprocesamiento de Datos"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+# Setup
+
+```{r setup, results = "hide"}
 require("knitr")
 opts_chunk$set(echo = TRUE)
 opts_knit$set(root.dir = "..")
 ```
 
-# Cargar librerías necesarias
 
-```{r}
+```{r, results = "hide"}
 library(dplyr)
 library(haven)
 ```
 
-El modulo 400 no tiene una columna de clasificaciones geográficas, asi que la crearemos.
+# Variable 'zona'
 
-Definimos una función para clasificar por zonas según ubigeo.
+El módulo 400 no tiene una columna de clasificaciones geográficas, asi que la crearemos.
 
-```{r}
+Definimos una función para clasificar las zonas según ubigeo.
+
+```{r, results = "hide"}
 #| label : funcion clasifica_zonas
 
 clasifica_zonas <- function(ubigeo) {
@@ -59,7 +62,12 @@ Creamos la columna `zona` aplicando la función a la columna `ubigeo` de nuestro
 #| label: datos$zona
 datos <- readRDS("outputs/datos.rds")
 datos$zona <- sapply(datos$ubigeo, clasifica_zonas)
+
+# veamos los datos
+head(datos)
 ```
+
+# Valores missings
 
 Ahora busquemos algunos valores missings.
 
@@ -77,6 +85,9 @@ missing_df <- data.frame(
 
 # guardamos los datos
 saveRDS(missing_df, file.path("outputs", "missing_df.rds"))
+
+# observamos los datos
+head(missing_df)
 ```
 
 La columna p4025, que nos indica si alguien sintio o no un malestar, contiene 105 missings. Echemos un vistazo a aquellas filas.
@@ -94,6 +105,9 @@ porcentajes_na <- datos |>
 
 
 saveRDS(porcentajes_na, file.path("outputs", "porcentajes.rds"))
+
+# observamos
+porcentajes_na
 ```
 
 Los datos faltantes representan únicamente el 0.04% del total de los datos, asi que podriamos prescindir de esa información.
@@ -137,4 +151,8 @@ datos_procesados <- datos |>
     mutate(across(starts_with("p403"), as.numeric))
 # guardamos los datos
 saveRDS(datos_procesados, file.path("outputs", "datos_procesados.rds"))
+
+#observamos
+
+head(datos_procesados)
 ```

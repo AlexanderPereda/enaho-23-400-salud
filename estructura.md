@@ -51,4 +51,5 @@ enaho-23-400-salud/
 │     └──── 04-eda.qmd
 └──── _quarto.yml
 
+
 ```

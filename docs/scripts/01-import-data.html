@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>01-import-data – ¿A dónde va un peruano cuando se enferma?</title>
+<title>Importar Datos – ¿A dónde va un peruano cuando se enferma?</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -6020,7 +6020,14 @@ window.onload = function() {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul class="collapse">
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#carga-de-los-datos" id="toc-carga-de-los-datos" class="nav-link" data-scroll-target="#carga-de-los-datos">Carga de los datos</a></li>
+  </ul>
+</nav>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -6031,7 +6038,7 @@ window.onload = function() {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">01-import-data</h1>
+<h1 class="title">Importar Datos</h1>
 </div>
 
 
@@ -6048,12 +6055,28 @@ window.onload = function() {
 </header>
 
 
+<section id="setup" class="level1">
+<h1>Setup</h1>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(<span class="st">&quot;knitr&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: knitr</code></pre>
+</div>
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>opts_knit<span class="sc">$</span><span class="fu">set</span>(<span class="at">root.dir =</span> <span class="st">&quot;..&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Linking to GEOS 3.12.2, GDAL 3.9.3, PROJ 9.4.1; sf_use_s2() is TRUE</code></pre>
@@ -6061,63 +6084,83 @@ window.onload = function() {
 </div>
 <p>Antes de trabajar con cualquier módulo de ENAHO, se recomienda leer con calma su ficha técnica y el diccionario de variables (el cual es descargado junto con los datos en el enlace provisto en la sección principal).</p>
 <p>Luego de haber hecho ese trabajo, importaremos solo las columnas que nos interesa para responder nuestra pregunta clave: ¿a dónde va un peruano cuando se siente mal?</p>
-<section id="enaho-2023---400" class="level3">
-<h3 class="anchored" data-anchor-id="enaho-2023---400">Enaho 2023 - 400</h3>
+</section>
+<section id="carga-de-los-datos" class="level1">
+<h1>Carga de los datos</h1>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-2" class="code-annotation-target"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>modulo400 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">&quot;data/enaho01a-2023-400.dta&quot;</span>)</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>columnas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">48</span>, <span class="dv">50</span><span class="sc">:</span><span class="dv">62</span>)</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-2-4" class="code-annotation-target"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(modulo400)[, ..columnas]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-2-5" class="code-annotation-target"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setnames</span>(datos, <span class="fu">tolower</span>(<span class="fu">names</span>(datos)))</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-2-6" class="code-annotation-target"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(datos, <span class="fu">file.path</span>(<span class="st">&quot;outputs&quot;</span>,<span class="st">&quot;datos.rds&quot;</span>))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="annotated-cell-4"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-1" class="code-annotation-target"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-4-2" class="code-annotation-target"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>modulo400 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">&quot;data/enaho01a-2023-400.dta&quot;</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-4-3" class="code-annotation-target"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>columnas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">48</span>, <span class="dv">50</span><span class="sc">:</span><span class="dv">62</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-4-4" class="code-annotation-target"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(modulo400)[, ..columnas]</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-4-5" class="code-annotation-target"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setnames</span>(datos, <span class="fu">tolower</span>(<span class="fu">names</span>(datos)))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-4-6" class="code-annotation-target"><a href="#annotated-cell-4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(datos, <span class="fu">file.path</span>(<span class="st">&quot;outputs&quot;</span>,<span class="st">&quot;datos.rds&quot;</span>))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-annotation">
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="1" data-code-annotation="1">Fijar semilla para reproducibilidad</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="1" data-code-annotation="1">Fijar semilla para reproducibilidad</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="2" data-code-annotation="2">Cargando el módulo completo desde el archivo .dta</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="2" data-code-annotation="2">Cargando el módulo completo desde el archivo .dta</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="3">Selección de columnas de interés</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="3" data-code-annotation="3">Selección de columnas de interés</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="4" data-code-annotation="4">Convertir el dataset a un formato de data.table</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="4" data-code-annotation="4">Convertir el dataset a un formato de data.table</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="5">5</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="5" data-code-annotation="5">Convertir los nombres de las columnas a minúsculas</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="5" data-code-annotation="5">Convertir los nombres de las columnas a minúsculas</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="6">6</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="6">6</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="6" data-code-annotation="6">Guardar la tabla en formato .rds</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="6" data-code-annotation="6">Guardar la tabla en formato .rds</span>
 </dd>
 </dl>
 </div>
 </div>
-<p>Con miras de realizar un mapa para graficar mejor la idea que queremos realizar importaremos también un un shapefile de Limites departamentales obtenido de la página de [datos abiertos del Perù](<a href="https://www.datosabiertos.gob.pe/dataset/limites-departamentales" class="uri">https://www.datosabiertos.gob.pe/dataset/limites-departamentales</a> “Ir al enlace”).</p>
+<p>Veamos los datos.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="annotated-cell-3"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a>peru_shapefile <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/DEPARTAMENTOS.shp&quot;</span>)</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-2" class="code-annotation-target"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(peru_shapefile, <span class="fu">file.path</span>(<span class="st">&quot;outputs&quot;</span>, <span class="st">&quot;departamentos.rds&quot;</span>))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ubigeo"],"name":[1],"type":["chr"],"align":["left"]},{"label":["p4025"],"name":[2],"type":["dbl+lbl"],"align":["right"]},{"label":["p4031"],"name":[3],"type":["dbl+lbl"],"align":["right"]},{"label":["p4032"],"name":[4],"type":["dbl+lbl"],"align":["right"]},{"label":["p4033"],"name":[5],"type":["dbl+lbl"],"align":["right"]},{"label":["p4034"],"name":[6],"type":["dbl+lbl"],"align":["right"]},{"label":["p4035"],"name":[7],"type":["dbl+lbl"],"align":["right"]},{"label":["p4036"],"name":[8],"type":["dbl+lbl"],"align":["right"]},{"label":["p4037"],"name":[9],"type":["dbl+lbl"],"align":["right"]},{"label":["p4038"],"name":[10],"type":["dbl+lbl"],"align":["right"]},{"label":["p4039"],"name":[11],"type":["dbl+lbl"],"align":["right"]},{"label":["p40310"],"name":[12],"type":["dbl+lbl"],"align":["right"]},{"label":["p40311"],"name":[13],"type":["dbl+lbl"],"align":["right"]},{"label":["p40313"],"name":[14],"type":["dbl+lbl"],"align":["right"]},{"label":["p40314"],"name":[15],"type":["dbl+lbl"],"align":["right"]}],"data":[{"1":"010201","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"1","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0"},{"1":"010201","2":"0","3":"0","4":"0","5":"0","6":"0","7":"1","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0"},{"1":"010201","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"1"},{"1":"010201","2":"1","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"010201","2":"1","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"010201","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Con miras de realizar un mapa para graficar mejor la idea que queremos realizar importaremos también un un shapefile de Limites departamentales obtenido de la página de <a href="https://www.datosabiertos.gob.pe/dataset/limites-departamentales">datos abiertos del Perú</a>.</p>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="annotated-cell-6"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-1" class="code-annotation-target"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a>peru_shapefile <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/DEPARTAMENTOS.shp&quot;</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-2" class="code-annotation-target"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(peru_shapefile, <span class="fu">file.path</span>(<span class="st">&quot;outputs&quot;</span>, <span class="st">&quot;departamentos.rds&quot;</span>))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-6-3" class="code-annotation-target"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(peru_shapefile)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-annotation">
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="1" data-code-annotation="1">Cargamos el shapefile donde esta contenida la informacion geoespacial que necesitamos del Perú.</span>
+<span data-code-cell="annotated-cell-6" data-code-lines="1" data-code-annotation="1">Cargamos el shapefile donde esta contenida la informacion geoespacial que necesitamos del Perú.</span>
 </dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="2" data-code-annotation="2">Guardamos el archivo para su posterior uso.</span>
+<span data-code-cell="annotated-cell-6" data-code-lines="2" data-code-annotation="2">Guardamos el archivo para su posterior uso.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="3" data-code-annotation="3">Visualizamos los datos.</span>
 </dd>
 </dl>
 </div>
@@ -6129,6 +6172,13 @@ Geometry type: MULTIPOLYGON
 Dimension:     XY
 Bounding box:  xmin: -81.32823 ymin: -18.35093 xmax: -68.65228 ymax: -0.03860597
 Geodetic CRS:  WGS 84</code></pre>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["IDDPTO"],"name":[1],"type":["chr"],"align":["left"]},{"label":["DEPARTAMEN"],"name":[2],"type":["chr"],"align":["left"]},{"label":["CAPITAL"],"name":[3],"type":["chr"],"align":["left"]},{"label":["FUENTE"],"name":[4],"type":["chr"],"align":["left"]},{"label":["geometry"],"name":[5],"type":["s_MULTIP"],"align":["right"]}],"data":[{"1":"01","2":"AMAZONAS","3":"CHACHAPOYAS","4":"INEI","5":"<s_MULTIP>","_rn_":"1"},{"1":"02","2":"ANCASH","3":"HUARAZ","4":"INEI","5":"<s_MULTIP>","_rn_":"2"},{"1":"03","2":"APURIMAC","3":"ABANCAY","4":"INEI","5":"<s_MULTIP>","_rn_":"3"},{"1":"04","2":"AREQUIPA","3":"AREQUIPA","4":"INEI","5":"<s_MULTIP>","_rn_":"4"},{"1":"05","2":"AYACUCHO","3":"AYACUCHO","4":"INEI","5":"<s_MULTIP>","_rn_":"5"},{"1":"06","2":"CAJAMARCA","3":"CAJAMARCA","4":"INEI","5":"<s_MULTIP>","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 </div>
 

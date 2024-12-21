@@ -45,10 +45,10 @@ En este trabajo haremos un análisis sobre una pregunta muy común: ¿A dónde a
 
 Agruparemos a la población peruana en cuatro zonas geográficas:
 
--    Norte: Tumbes, Piura, Lambayeque, Cajamarca, La Libertad y Amazonas.
--    Sur: Ayacucho, Cusco, Apurímac, Arequipa, Puno, Moquegua y Tacna.
--    Oriente: Loreto, San Martín, Ucayali y Madre de Dios.
--    Centro: Áncash, Huánuco, Pasco, Junín, Huancavelica, Ica, Callao y Lima.
+-   Norte: Tumbes, Piura, Lambayeque, Cajamarca, La Libertad y Amazonas.
+-   Sur: Ayacucho, Cusco, Apurímac, Arequipa, Puno, Moquegua y Tacna.
+-   Oriente: Loreto, San Martín, Ucayali y Madre de Dios.
+-   Centro: Áncash, Huánuco, Pasco, Junín, Huancavelica, Ica, Callao y Lima.
 
 Nos proponemos a responder las siguientes preguntas:
 
@@ -64,7 +64,7 @@ La información general del proyecto es la siguiente:
 
 -   Entorno de trabajo: Visual Studio Code.
 
--   Lenguaje de programacion: R.   
+-   Lenguaje de programacion: R.
 
 -   Formato: El documento se realizó en Quarto, y se adoptó un enfoque narrativo para los resultados. Los archivos están debidamente comentados y siguen buenas prácticas para garantizar la reproducibilidad.
 
@@ -90,7 +90,7 @@ datos[1:10, ]
 A continuación una tabla para describir los datos:
 
 | Variable | Descripción |
-|-------------------------|----------------------------------------------|
+|--------------------------|----------------------------------------------|
 | Ubigeo | Ubicación geográfica |
 | p4025 | ¿Presentó algún malestar en las últimas 4 semanas? (1: No / 0: Sí) |
 | p4031 | Acudió al "Puesto de salud MINSA" a consultar por el malestar (1: Sí / 0: No) |
@@ -199,12 +199,13 @@ tabla
 
 A pesar de que las cantidades pueden variar, el resultado es el mismo: La gran mayoria prefiere no buscar atención.
 
-<p> </p>
+<p>
+
+</p>
 
 ::: image
 [Preferencias de la población con malestar en el Perú.]{style="display: block; text-align: center; margin-top: 5px;"} ![preferencias-peru](outputs/barras.png) [Elaboración propia.]{style="display: block; text-align: center; font-style: italic; margin-top: 5px;"} [Fuente: Enaho 2023, Módulo 400]{style="display: block; text-align: center; font-style: italic;"}
 :::
-
 
 <hr>
 
@@ -212,18 +213,17 @@ A pesar de que las cantidades pueden variar, el resultado es el mismo: La gran m
 
 -   Independientemente de la zona geográfica, el peruano reacciona prácticamente de la misma manera ante un malestar.
 
--   La zona centro es la que presenta la mayor concentración de individuos con malestar (40%). 
+-   La zona centro es la que presenta la mayor concentración de individuos con malestar (40%).
 
 -   Aproximadamente 46.6% de la población no busca atención ante una dolencia.
 
 -   El 28% de la población prefiere atenderse en una botica o farmacia, muy probablemente debido al fácil acceso y precios de dichos establecimientos.
 
-
 # Scripts del Proyecto
 
 Puedes acceder a los scripts utilizados en este proyecto. Haz clic en los enlaces para verlos con el formato visual adecuado.
 
-- [01. Importar Datos](scripts/01-import-data.html)
-- [02. Preprocesamiento de Datos](scripts/02-preprocess-data.html)
-- [03. Mapa](scripts/03-mapa.html)
-- [04. EDA (Análisis Exploratorio de Datos)](scripts/04-eda.html)
+-   [Importar Datos](scripts/01-import-data.html)
+-   [Preprocesamiento de Datos](scripts/02-preprocess-data.html)
+-   [Mapa](scripts/03-mapa.html)
+-   [EDA (Análisis Exploratorio de Datos)](scripts/04-eda.html)
