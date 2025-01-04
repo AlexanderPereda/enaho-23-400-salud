@@ -1,8 +1,8 @@
 project:
   type: website
-  output-dir: docs  
+  output-dir: docs
   execute-dir: project
-  
+
 website:
   title: "¿A dónde va un peruano cuando se enferma?"
 
@@ -34,3 +34,8 @@ format:
     highlight-style: github
     theme:
       dark: darkly
+
+metadata:
+  og:image: "https://github.com/AlexanderPereda/enaho-23-400-salud/blob/main/enfermo.jpg?raw=true"
+  og:title: "¿A dónde va un peruano cuando se enferma?"
+  og:description: "Un análisis detallado de la salud de los peruanos usando datos de la ENAHO 2023."

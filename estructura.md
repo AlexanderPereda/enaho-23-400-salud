@@ -22,6 +22,7 @@ enaho-23-400-salud/
 │     ├──── scripts/
 │     ├──── search.json
 │     └──── site_libs/
+├──── enfermo.jpg
 ├──── estructura.md
 ├──── LICENSE
 ├──── main.qmd
