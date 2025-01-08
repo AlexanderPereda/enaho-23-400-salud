@@ -28,7 +28,7 @@ instalar_paquete <- function(paquete) {
 
 # Lista de paquetes necesarios
 paquetes <- c(
-    "data.table", "haven", "dplyr", "rmarkdown", "ggplot2",
+    "data.table", "survey", "haven", "dplyr", "rmarkdown", "ggplot2",
     "sf", "tidyr", "patchwork", "clipr", "crayon", "prettyunits", "knitr", "here"
 )
 
@@ -122,9 +122,9 @@ porcentajes
 
 Observamos:
 
--   El Sur presenta la mayor tasa de valores faltantes (44%), seguido del Centro (32%).
+-   El Sur presenta la mayor tasa de valores faltantes (44.8%), seguido del Centro (32%).
 -   El Norte y Oriente presentan tasas bajas (15% y 7%, respectivamente).
--   Hay 105 valores faltantes, que representan el 0.087% de nuestros datos totales.
+-   Hay 105 valores faltantes, que representan el 0.092% de nuestros datos
 -   Dado que los datos faltantes son tan pocos, podemos eliminarlos.
 
 Además, como solo nos interesan los casos de personas enfermas, filtramos la información para quedarnos solo con ese sector.
@@ -211,11 +211,11 @@ A pesar de que las cantidades pueden variar, el resultado es el mismo: La gran m
 
 # Conclusiones
 
--   Independientemente de la zona geográfica, el peruano reacciona prácticamente de la misma manera ante un malestar.
+-   Independientemente de la zona geográfica, el peruano reacciona prácticamente de la misma manera ante un malestar: Prefiere atenderse el mismo.
 
 -   La zona centro es la que presenta la mayor concentración de individuos con malestar (40%).
 
--   Aproximadamente 46.6% de la población no busca atención ante una dolencia.
+-   Aproximadamente 58.7% de la población no busca atención ante una dolencia.
 
 -   El 28% de la población prefiere atenderse en una botica o farmacia, muy probablemente debido al fácil acceso y precios de dichos establecimientos.
 

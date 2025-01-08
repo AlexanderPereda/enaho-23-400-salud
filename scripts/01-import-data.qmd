@@ -13,6 +13,7 @@ opts_knit$set(root.dir = "..")
 
 ```{r, results = "hide"}
 library(haven)
+library(survey)
 library(data.table)
 library(sf)
 ```
@@ -24,24 +25,34 @@ Luego de haber hecho ese trabajo, importaremos solo las columnas que nos interes
 # Carga de los datos
 
 ```{r}
-#| label : import_data
+#|label : declarando_design
 
-set.seed(123)                                                                # <1>
-modulo400 <- read_dta("data/enaho01a-2023-400.dta")                          # <2>
-columnas <- c(7, 48, 50:62)                                                  # <3>
-datos <- as.data.table(modulo400)[, ..columnas]                              # <4>
-setnames(datos, tolower(names(datos)))                                       # <5>
-saveRDS(datos, file.path("outputs","datos.rds"))                             # <6>
+set.seed(123)
+
+enaho400 <- read_dta("data/enaho01a-2023-400.dta")
+
+modulo400 <- svydesign(id = ~conglome+vivienda,
+                      strata = ~estrato,
+                      weights = ~factor07,
+                      data = enaho400)
 ```
 
-1.  Fijar semilla para reproducibilidad
-2.  Cargando el módulo completo desde el archivo .dta
-3.  Selección de columnas de interés
-4.  Convertir el dataset a un formato de data.table
-5.  Convertir los nombres de las columnas a minúsculas
-6.  Guardar la tabla en formato .rds
+```{r}
+#| label : import_data
+
+columnas <- c(7, 48, 50:62)                                                  # <1>
+datos <- as.data.table(modulo400$variables)[, ..columnas]                    # <2>
+setnames(datos, tolower(names(datos)))                                       # <3>
+saveRDS(datos, file.path("outputs","datos.rds"))                             # <4>
+```
+
+1.  Selección de columnas de interés
+2.  Convertir el dataset a un formato de data.table
+3.  Convertir los nombres de las columnas a minúsculas
+4.  Guardar la tabla en formato .rds
 
 Veamos los datos.
+
 ```{r}
 head(datos)
 ```

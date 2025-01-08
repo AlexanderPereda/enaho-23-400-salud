@@ -18,7 +18,7 @@ library(ggplot2)
 library(patchwork)  
 ```
 
-#
+# 
 
 ```{r}
 #| label : funcion grafico_zona

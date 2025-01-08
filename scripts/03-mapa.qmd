@@ -17,7 +17,6 @@ library(sf)
 library(ggplot2)
 ```
 
-
 # Función de asignación
 
 Crearemos un mapa para visualizar la distribución de individuos enfermos según zona.
@@ -57,7 +56,6 @@ peru_shapefile$zona <- sapply(peru_shapefile$DEPARTAMEN, asignar_zona)
 # Ver el resultado
 head(peru_shapefile)
 ```
-
 
 # Conteo
 
